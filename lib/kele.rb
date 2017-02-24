@@ -1,12 +1,41 @@
-require 'httparty'
+require 'rest_client'
+require 'json'
+#require_relative 'kele/errors.rb'
 
 class Kele
-  include HTTParty
-  
   def initialize(email, password)
-    @bloc_api = 'https://private-anon-9166bbd7c2-blocapi.apiary-mock.com/api/v1/sessions'
-    @user_auth_token = self.class.post(@bloc_api, body: {email: email, password: password})
+    values = {
+      email: email,
+      password: password
+    }
+    
+    headers = {
+      content_type: 'application/json'
+    }
+    
+    response = RestClient.post bloc_api("sessions"), values, headers
+ #   raise InvalidStudentError.new() if response.code == 401
+    @auth_token = JSON.parse(response.body)["auth_token"]
   end
-end
 
+  def get_me
+    headers = { 
+      content_type: 'application/json',
+      authorization: @auth_token 
+    }
+    
+    response = RestClient.get bloc_api("users/me"), headers
+    @user_info = JSON.parse(response.body)
+    @user_info.keys.each do |key|
+      self.class.send(:define_method, key.to_sym) do
+        @user_info[key]
+      end
+    end
+    @user_info
+  end
   
+  def bloc_api(endpoint)
+    "https://www.bloc.io/api/v1/#{endpoint}"
+  end
+  
+end
