@@ -1,9 +1,12 @@
+require 'kele/errors'
+require 'kele/roadmap'
 require 'rest_client'
 require 'json'
 require 'pp'
-#require_relative 'kele/errors.rb'
 
 class Kele
+  include Roadmap
+
   def initialize(email, password)
     values = {
       email: email,
