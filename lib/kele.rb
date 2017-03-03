@@ -1,11 +1,13 @@
 require 'kele/errors'
 require 'kele/roadmap'
+require 'kele/messages'
 require 'rest_client'
 require 'json'
 require 'pp'
 
 class Kele
   include Roadmap
+  include Messages
 
   def initialize(email, password)
     values = {
@@ -48,6 +50,7 @@ class Kele
     @mentor_availability = JSON.parse(response.body)
     pp @mentor_availability
   end
+
 
   def bloc_api(endpoint)
     "https://www.bloc.io/api/v1/#{endpoint}"
